@@ -34,9 +34,9 @@ locals {
 
   global_location = var.main_location
 
-  global_tags   = { Instance = "Global" }
-  main_tags     = { Instance = "Main" }
-  failover_tags = { Instance = "Failover" }
+  global_tags   = { Instance = "Global", Ambiente = "POC", Analitica = "121-00000", Creator = "Javier Ibarra", Proyecto = "PoC Kubernetes para ODI", Sector = "Tecnologia" }
+  main_tags     = { Instance = "Main", Ambiente = "POC", Analitica = "121-00000", Creator = "Javier Ibarra", Proyecto = "PoC Kubernetes para ODI", Sector = "Tecnologia" }
+  failover_tags = { Instance = "Failover", Ambiente = "POC", Analitica = "121-00000", Creator = "Javier Ibarra", Proyecto = "PoC Kubernetes para ODI", Sector = "Tecnologia" }
 }
 
 ### Networking Setup 
