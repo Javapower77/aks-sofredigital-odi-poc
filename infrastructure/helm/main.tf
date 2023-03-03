@@ -26,7 +26,7 @@ provider "azurerm" {
 locals {
   main_root_name      = "${var.application_name}-${var.environment}-${var.main_instance}"
   aks_name            = "aks-${local.main_root_name}"
-  resource_group_name = "rg-${local.main_root_name}"
+  resource_group_name = "Sofrecom-PoC-AKS-rg-${local.main_root_name}"
 }
 
 data "azurerm_kubernetes_cluster" "default" {
