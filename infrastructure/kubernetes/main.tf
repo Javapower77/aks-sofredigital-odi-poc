@@ -67,14 +67,14 @@ resource "kubernetes_service_account" "default" {
   metadata {
     name      = local.service_account_name
     namespace = var.aks_namespace
-    annotations = {
-      "azure.workload.identity/client-id" = data.azuread_application.default.application_id
-    }
-    labels = {
-      "azure.workload.identity/use" : "true"
-    }
+    annotations = { "azure.workload.identity/client-id" = data.azuread_application.default.application_id }
+    labels = { "azure.workload.identity/use" : "true" }
   }
+    depends_on = [
+    module.aks, kubernetes_namespace.namespace
+  ]
 }
+
 
 ### ConfigMap
 
