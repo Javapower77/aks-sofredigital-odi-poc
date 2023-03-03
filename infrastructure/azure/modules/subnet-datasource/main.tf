@@ -11,7 +11,7 @@ variable "instance" {
 # Params
 
 locals {
-  rg_name   = "rg-network-${var.environment}-${var.instance}"
+  rg_name   = "Sofrecom-PoC-AKS-rg-network-${var.environment}-${var.instance}"
   vnet_name = "vnet-network-${var.environment}-${var.instance}"
 }
 
