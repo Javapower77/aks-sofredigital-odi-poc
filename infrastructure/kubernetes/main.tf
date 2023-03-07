@@ -6,7 +6,7 @@ terraform {
     }
     kubernetes = {
       source  = "hashicorp/kubernetes"
-      version = "2.11.0"
+      version = "2.14.0"
     }
     azuread = {
       source  = "hashicorp/azuread"
@@ -67,12 +67,13 @@ resource "kubernetes_service_account" "default" {
   metadata {
     name      = local.service_account_name
     namespace = var.aks_namespace
-    annotations = { "azure.workload.identity/client-id" = data.azuread_application.default.application_id }
-    labels = { "azure.workload.identity/use" : "true" }
+    annotations = {
+      "azure.workload.identity/client-id" = data.azuread_application.default.application_id
+    }
+    labels = {
+      "azure.workload.identity/use" : "true"
+    }
   }
-    depends_on = [
-    kubernetes_namespace.namespace
-  ]
 }
 
 
