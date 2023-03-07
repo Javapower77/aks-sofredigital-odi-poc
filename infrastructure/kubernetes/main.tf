@@ -26,12 +26,12 @@ provider "azurerm" {
 ### Local Variables
 
 locals {
-  main_root_name        = "${var.application_name}-${var.environment}-${var.main_instance}"
+  main_root_name        = "${var.application_name}-${var.environment}-${var.failover_instance}"
   resource_group_name   = "Sofrecom-PoC-AKS-rg-${local.main_root_name}"
   keyvault_name         = "kv-${local.main_root_name}"
   aks_name              = "aks-${local.main_root_name}"
   app_registration_name = "aks-service-principal-${local.main_root_name}"
-  service_account_name  = "workload-identity-sa"
+  service_account_name  = "workload-identity-sa-${var.failover_instance}"
 }
 
 ### Connect to Kubernetes
@@ -73,6 +73,19 @@ resource "kubernetes_service_account" "default" {
     labels = {
       "azure.workload.identity/use" : "true"
     }
+  }
+  
+  automount_service_account_token = true
+  
+  secret {
+    name = ""
+  }
+
+  lifecycle {
+    ignore_changes = [
+      image_pull_secret,
+      secret
+    ]
   }
 }
 
