@@ -26,12 +26,12 @@ provider "azurerm" {
 ### Local Variables
 
 locals {
-  main_root_name        = "${var.application_name}-${var.environment}-${var.failover_instance}"
+  main_root_name        = "${var.application_name}-${var.environment}-${var.main_instance}"
   resource_group_name   = "Sofrecom-PoC-AKS-rg-${local.main_root_name}"
   keyvault_name         = "kv-${local.main_root_name}"
   aks_name              = "aks-${local.main_root_name}"
   app_registration_name = "aks-service-principal-${local.main_root_name}"
-  service_account_name  = "workload-identity-sa-${var.failover_instance}"
+  service_account_name  = "workload-identity-sa"
 }
 
 ### Connect to Kubernetes
@@ -132,9 +132,9 @@ resource "kubernetes_pod" "quick_start" {
     }
   }
 
-  depends_on = [
-    kubernetes_service_account.default
-  ]
+  #depends_on = [
+  #  kubernetes_service_account.default
+  #]
 
   lifecycle {
     ignore_changes = [
