@@ -1,179 +1,176 @@
 # BASA ODI - Prueba de Concepto, Cluster AKS Multi-Region
 
-A multi-region AKS cluster managed using Terraform.
+Una PoC para armar un cluster manejado de Azure Kubernetes deployado en multi region para darle soporte al Disaster Recovery y la Alta Disponibilidad. Utilice Terraform para IaaC de la infra.
 
-This is an implementation derived from [AKS Baseline for Multiregion AKS Clusters](https://docs.microsoft.com/en-us/azure/architecture/reference-architectures/containers/aks-multi-region/aks-multi-cluster).
+Utilice la base documental sobre AKS en Multiregion de la pagina oficil de Microsoft [AKS Baseline for Multiregion AKS Clusters](https://docs.microsoft.com/en-us/azure/architecture/reference-architectures/containers/aks-multi-region/aks-multi-cluster).
 
-## Solution Architecture
+## Arquitectura de la Solucion
 
 ![Multi-region Solution][1]
 
 ### Workload Identity
 
-This solution also implements Azure Workload Identity.
+Esta solucion tambien implementa Azure Workload Identity.
 
-Enabling Pods to connect directly to the Key Vaults without exchanging the KV token ended up being it's own separate project.
-
-You can check it in isolation in my repo [azure-workload-identity-terraform](https://github.com/epomatti/azure-workload-identity-terraform).
+Permitir que los Pods se conecten directamente a los Key Vaults sin intercambiar el token de KV acabó siendo un proyecto aparte.
+[azure-workload-identity-terraform](https://github.com/epomatti/azure-workload-identity-terraform).
 
 ![Worload Identity][2]
 
-## Cloud Deployment
+## Deployando en la Nube
 
-Follow these steps to deploy the complete demonstration solution.
+Estos son los pasos a alto nivel para deployar la solucion
 
 ```mermaid
 graph TD
-    oidc("1 - Enable OIDC Issuer (Preview)")
-    oidc --> network(2 - Deploy Network Infrastructure)
-    network -->|3 -Connect to Bastion| workload(4 - Deploy Workload Infrastructure)
-    workload --> awi("5 - Install AWI (Helm Provider)")
-    awi --> kubernetes("6 - Setup K8S objects (Kubernetes Provider)")
-    kubernetes -->|kubectl| pods("7a - Deploy Kuberentes Pods & Services (yaml)")
-    pods --> ingress("7b - Deploy Ingress Controller Rules (yaml)")
+    oidc("1 - Habilitar OIDC Issuer (Preview) en el AKS")
+    oidc --> network(2 - Deployar la infraestructura de red)
+    network -->|3 - Conectarse con Bastion| workload(4 - Deployar la Infra del Workload)
+    workload --> awi("5 - Instalar el AWI (Helm Provider)")
+    awi --> kubernetes("6 - Configurar los objetos del kubernetes (Kubernetes Provider)")
+    kubernetes -->|kubectl| pods("7a - Deployar los Pods y servicios (yaml) del kubernetes")
+    pods --> ingress("7b - Deployar las reglas del Ingress Controller (yaml)")
 ```
 
-### 1 - Enable OIDC Issuer (Preview)
+### 1 - Habilitar OIDC Issuer (Preview)
 
-Enable [OIDC Preview](https://docs.microsoft.com/en-us/azure/aks/cluster-configuration#oidc-issuer-preview) as part of Managed Identity configuration. Follow the documentation and once finished, return here to create to continue.
+Hay que habilitar [OIDC Preview](https://docs.microsoft.com/en-us/azure/aks/cluster-configuration#oidc-issuer-preview) com parte del manejo de la configuracion de la seguridad integrada. Seguir los pasos en ese link.
 
-### 2 - Network Deployment
+### 2 - Deployar la Infra de Red
 
-These are the base components on which your workload will be deployed:
+Estos son los componentes base sobre los que se desplegará los workloads:
 
 ```sh
-# Create Azure resources
+# Crear los recursos de Azure
 terraform -chdir='infrastructure/network' init
 terraform -chdir='infrastructure/network' apply -auto-approve
 ```
 
-The AKS cluster, along with Key Vault and Cosmos, will be private.
+Todo es privado, nada esta expuesto con IP Publicas. Para acceder se puede usar la VM creado en cada region usando Bastion, o conectarse a la VPN.
 
-You can now connect to the JumpBox VM using Bastion, and securely access the Kubernetes network.
+### 3 - Conectarse al Bastion
 
-### 3 - Connect to Azure Bastion
+La VM jumpbox se iniciará con un script `cloud-init` para instalar Terraform, Azure CLI y Kubectl automáticamente. Utilizar Bastion para conectarse a la máquina virtual y clonar/descargar el código fuente de nuevo.
 
-The jumpbox machine will be initiated with a `cloud-init` script to install Terraform, Azure CLI and Kubectl automatically. Use Bastion to connect to the Virtual Machine and clone /download the source code again.
+Hay que volver a loguear a Azure con `az login`.
 
-You'll need to login to Azure again with `az login`.
+### 4 - Infra de Workload
 
-### 4 - Workload Infrastructure
-
-This will create all of the Azure resources: AKS, Cosmos, Ingress, Key Vault, Log Analytics, and many others.
+Este script creara estos recursos: AKS, Cosmos, Ingress, Key Vault, Log Analytics, entre otros
 
 ```sh
 terraform -chdir='infrastructure/azure' init
 terraform -chdir='infrastructure/azure' apply -auto-approve
 ```
 
-### 5 - Helm Setup + Workload Identity
+### 5 - Setup de Helm, mas Identidad de Workload 
 
-This will deploy the Workload Identity components using a Helm provider.
+Este script deploya los componentes de Identidad de Workload usando el proveedor de Helm
 
 ```sh
 terraform -chdir='infrastructure/helm' init
 terraform -chdir='infrastructure/helm' apply -auto-approve
 ```
 
-This step needs to be performed in the Main and Failover instances.
+Hay que ejecutar este script en ambos cluster (main y failover)
 
-### 6 - Kubernetes Setup
+### 6 - Configuracion del Kubernetes
 
-Setup of the Kubernetes resources, such as Config and Secrets with connection strings that are derived from dynamic values generated by Azure.
+Configuracion de los recursos del Kubernetes, como el config map y secrets con las cadenas de conexion que son designadas dinamicamente por azure.
 
 ```sh
 terraform -chdir='infrastructure/kubernetes' init
 terraform -chdir='infrastructure/kubernetes' apply -auto-approve
 ```
 
-This step needs to be performed in the Main and Failover instances.
+Tambien hay que ejecutar este script en ambos cluster (main y failover)
 
-You can use TF output to connect to Kubernetes:
+Para conectarse al kubernetes se puede usar la variable de output que genera el terraform:
 
 ```terraform
 aks_get_credentials_command = "az aks get-credentials -g <rg> -n <aks>"
 ```
 
 
-### 7 - Kubernetes Manifest Deployment
+### 7 - Deployar el Manifest del Kubernetes
 
-Create the Kubernetes objects defined in `yaml` manifests:
+Crea los objetos de Kubernetes definidos en los archivos de manifiesto yaml.
 
 ```sh
-# Connect to the cluster
+# Conectarse al cluster
 group='<resource_group_name>'
 aks='<ask_cluster_name>'
 
 az aks get-credentials -g $group -n $aks
 
-# Create the Deployments and Services
+# Crear los Deploy y Services
 kubectl apply -f 'kubernetes'
 
-# Deploy the rules to the Application Gateway
+# Deploya las reglas al Application Gateway
 kubectl apply -f 'kubernetes/azure'
 ```
 
-This step needs to be performed in the Main and Failover instances.
+Nuevamente hay que ejecutar este script en ambos cluster (main y failover)
 
-🏆 That's it! Services should be available using the Azure Front Door endpoint.
+Listo! Los servicios estan disponibles mediente el endpoint de Azure Front Door.
 
-## Local Development
+## Deploy Local
 
-Start MongoDB
+Iniciar MongoDB
 
 ```sh
 docker run -d --name mongodb -p 27017:27017 mongo
 ```
 
-Working with the microservices (open each one individually on VS Code for a better experience):
+Trabajar con los microservicios (abrir cada uno individualmente en VS Code para una mejor experiencia):
 
 ```sh
-# Creates venv in project
+# Crea el venv dentro del proyecto
 mkdir .venv
 
 cp config/dev.env .env
 cp config/dev.flaskenv .flaskenv
 
-# Ad-hoc fix for https://github.com/pypa/setuptools/issues/3278
+# Ad-hoc fix para https://github.com/pypa/setuptools/issues/3278
 export SETUPTOOLS_USE_DISTUTILS=stdlib
 
-# get the dependencies
+# obtiene las dependencias
 pipenv install --dev
 pipenv shell
 
-# start
+# inicializa
 python3 -m flask run
 ```
-### Core Module
+###  Modulo principal
 
-Common code is shared in the `core` module.
+El codigo en comun es compartido en el modulo principal
 
-To code in it:
+Para codearlo:
 
 ```bash
 poetry install
 poetry shell
 ```
 
-To publish, bump the version in `pyproject.toml` and then:
+Para publicarlo, hacer un bump de la verion en `pyproject.toml` y luego:
 
 ```bash
 poetry build
 poetry publish
 ```
 
-### Local development with Cloud resources
+### Deploy local con recursos de la nube
 
-This will create the necessary resources to develop locally but with Azure resources instead of locals, which is useful to test before pushing for integration testing.
+Esto creará los recursos necesarios para desarrollar localmente pero con recursos Azure en lugar de locales, lo cual es útil para probar antes de impulsar las pruebas de integración.
 
 ```sh
 terraform -chdir='infrastructure/development' init
 terraform -chdir='infrastructure/development' apply -auto-approve
 ```
 
-Set the Key Vault URI to your `.env` file.
+Setear el Key Vault URI al archivo  `.env` 
 
-Authentication works via local context, so you must be connected with `az login`. Microsoft SDKs will automatically detect the authenticated context when connecting to the Key Vault.
+La autenticación funciona a través del contexto local, por lo que debe estar conectado con `az login`. Los SDK de Microsoft detectarán automáticamente el contexto autenticado al conectarse a Key Vault.
 
 ### Minikube
 
@@ -198,7 +195,7 @@ docker run -p 4000:8080 --name poll-app poll
 docker run -p 5000:8080 --name vote-app vote
 ```
 
-Or with Docker Compose:
+O con Docker Compose:
 
 ```sh
 docker-compose build
