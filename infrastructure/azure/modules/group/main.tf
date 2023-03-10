@@ -1,5 +1,5 @@
 resource "azurerm_resource_group" "default" {
-  name     = "Sofrecom-PoC-AKS-rg-${var.root_name}"
+  name     = "Sofrelabs-${var.root_name}-rg"
   location = var.location
 
   tags = var.tags
