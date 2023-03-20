@@ -34,3 +34,15 @@ variable "cosmos_connection_string" {
 variable "tags" {
   type = map(string)
 }
+
+variable "app_name" {
+  type = string
+}
+
+variable "env" {
+  type = string
+}
+
+variable "instance" {
+  type = string
+}

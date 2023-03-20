@@ -50,7 +50,7 @@ variable "tags" {
 
 
 locals {
-  workload_name                         = "odiapp2023-${var.environment}-${var.instance}"
+  workload_name                         = "${var.application_name}-${var.environment}-${var.instance}"
   aks_namespace                         = "default"
   app_registration_service_account_name = "workload-identity-sa"
 }
@@ -99,7 +99,7 @@ module "app_registration" {
 
 module "kv" {
   source                          = "../modules/keyvault"
-  root_name                       = "odiapp2023-${var.environment}-${var.instance}"
+  root_name                       = "${var.application_name}-${var.environment}-${var.instance}"
   resource_group_name             = module.group.name
   location                        = var.location
   aks_subnet_id                   = var.aks_subnet_id
@@ -108,4 +108,7 @@ module "kv" {
   aks_service_principal_object_id = module.app_registration.aks_service_principal_object_id
   cosmos_connection_string        = var.cosmos_primary_connection_tring
   tags                            = var.tags
+  app_name                        = var.application_name
+  env                             = var.environment
+  instance                        = var.instance
 }
