@@ -46,3 +46,8 @@ variable "env" {
 variable "instance" {
   type = string
 }
+
+variable "kv_prefix" {
+  type = string
+  default = "kv"
+}

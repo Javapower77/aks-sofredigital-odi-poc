@@ -15,6 +15,10 @@ variable "instance" {
   type = string
 }
 
+variable "prefix" {
+  type = string
+}
+
 variable "gateway_subnet_id" {
   type = string
 }
@@ -111,4 +115,5 @@ module "kv" {
   app_name                        = var.application_name
   env                             = var.environment
   instance                        = var.instance
+  prefix                          = var.prefix
 }
