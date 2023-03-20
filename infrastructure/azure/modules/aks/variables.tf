@@ -16,7 +16,7 @@ variable "default_namespace" {
 
 variable "node_count" {
   type    = number
-  default = 1
+  default = 2
 }
 
 variable "vm_size" {

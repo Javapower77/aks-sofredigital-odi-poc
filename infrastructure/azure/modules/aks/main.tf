@@ -3,7 +3,7 @@ resource "azurerm_kubernetes_cluster" "default" {
   resource_group_name     = var.resource_group_name
   location                = var.location
   dns_prefix              = "aks-${var.root_name}"
-  node_resource_group     = "Sofrelabs-ODI-AKS-${var.root_name}"
+  node_resource_group     = "Sofrelabs-ODI-AKS-${var.root_name}-rg"
   private_cluster_enabled = true
   oidc_issuer_enabled     = true
 
