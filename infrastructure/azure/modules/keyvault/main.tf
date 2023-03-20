@@ -5,7 +5,7 @@ locals {
 }
 
 resource "azurerm_key_vault" "default" {
-  name                       = var.kv_prefix
+  name                       = local.kv-prefix
   resource_group_name        = var.resource_group_name
   location                   = var.location
   tenant_id                  = data.azurerm_client_config.current.tenant_id
