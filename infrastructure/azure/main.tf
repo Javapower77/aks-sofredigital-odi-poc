@@ -86,7 +86,7 @@ module "workload_main" {
   gateway_subnet_id = module.subnets_main.gateway_subnet_id
   aks_subnet_id     = module.subnets_main.aks_subnet_id
   jumpbox_subnet_id = module.subnets_main.jumpbox_subnet_id
-  kv_prefix         = "kv"
+  kv_prefix         = var.kv_prefix
 
   # Allow failover Jumpbox to access KeyVault on Main region
   backup_jumpbox_subnet_id = module.subnets_failover.jumpbox_subnet_id
@@ -106,8 +106,8 @@ module "workload_failover" {
   gateway_subnet_id = module.subnets_failover.gateway_subnet_id
   aks_subnet_id     = module.subnets_failover.aks_subnet_id
   jumpbox_subnet_id = module.subnets_failover.jumpbox_subnet_id
-   kv_prefix         = "kv"
-   
+   kv_prefix        = var.kv_prefix
+
   # Allow main Jumpbox to access KeyVault on Failover region
   backup_jumpbox_subnet_id = module.subnets_main.jumpbox_subnet_id
 

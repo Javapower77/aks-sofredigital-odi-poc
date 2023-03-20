@@ -11,6 +11,11 @@ variable "application_name" {
   }
 }
 
+variable "kv_prefix" {
+  type = "string"  
+  default = "kv"
+}
+
 variable "main_location" {
   type        = string
   description = "The location of the Main site."
