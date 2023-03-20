@@ -12,7 +12,7 @@ variable "application_name" {
 }
 
 variable "kv_prefix" {
-  type = "string"  
+  type = string  
   default = "kv"
 }
 
