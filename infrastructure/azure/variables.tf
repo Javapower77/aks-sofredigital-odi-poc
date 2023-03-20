@@ -3,7 +3,7 @@
 variable "application_name" {
   type        = string
   description = "The application name is used for composition of all the resouces in the solution."
-  default     = "odiapp2023"
+  default     = "odiapp"
 
   validation {
     condition     = can(regex("^[[:alnum:]]+$", var.application_name))
