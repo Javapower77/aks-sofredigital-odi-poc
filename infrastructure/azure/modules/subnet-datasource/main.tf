@@ -11,7 +11,7 @@ variable "instance" {
 # Params
 
 locals {
-  rg_name   = "Sofrelabs-ODI-network-${var.environment}-${var.instance}"
+  rg_name   = "Sofrelabs-ODI-network-${var.environment}-${var.instance}-rg"
   vnet_name = "vnet-network-${var.environment}-${var.instance}"
 }
 
