@@ -46,7 +46,6 @@ resource "azurerm_monitor_diagnostic_setting" "application_gateway" {
 
   enabled_log {
     category = "ApplicationGatewayAccessLog"
-    enabled  = true
 
     retention_policy {
       days    = 7
@@ -56,7 +55,6 @@ resource "azurerm_monitor_diagnostic_setting" "application_gateway" {
 
   enabled_log {
     category = "ApplicationGatewayPerformanceLog"
-    enabled  = true
 
     retention_policy {
       days    = 7
@@ -66,7 +64,6 @@ resource "azurerm_monitor_diagnostic_setting" "application_gateway" {
 
   enabled_log {
     category = "ApplicationGatewayFirewallLog"
-    enabled  = true
 
     retention_policy {
       days    = 7
