@@ -99,7 +99,7 @@ module "app_registration" {
 
 module "kv" {
   source                          = "../modules/keyvault"
-  root_name                       = "${var.environment}-${var.instance}"
+  root_name                       = "odiapp2023-${var.environment}-${var.instance}"
   resource_group_name             = module.group.name
   location                        = var.location
   aks_subnet_id                   = var.aks_subnet_id
