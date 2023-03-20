@@ -1,7 +1,7 @@
 data "azurerm_client_config" "current" {}
 
 locals {
-  kv-prefix = "kv"
+  kv-prefix = "kv-1"
 }
 
 resource "azurerm_key_vault" "default" {
