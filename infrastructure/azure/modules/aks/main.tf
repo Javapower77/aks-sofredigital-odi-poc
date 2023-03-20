@@ -44,7 +44,7 @@ resource "azurerm_monitor_diagnostic_setting" "application_gateway" {
   target_resource_id         = azurerm_kubernetes_cluster.default.ingress_application_gateway[0].effective_gateway_id
   log_analytics_workspace_id = var.log_analytics_workspace_id
 
-  log {
+  enabled_log {
     category = "ApplicationGatewayAccessLog"
     enabled  = true
 
@@ -54,7 +54,7 @@ resource "azurerm_monitor_diagnostic_setting" "application_gateway" {
     }
   }
 
-  log {
+  enabled_log {
     category = "ApplicationGatewayPerformanceLog"
     enabled  = true
 
@@ -64,7 +64,7 @@ resource "azurerm_monitor_diagnostic_setting" "application_gateway" {
     }
   }
 
-  log {
+  enabled_log {
     category = "ApplicationGatewayFirewallLog"
     enabled  = true
 
