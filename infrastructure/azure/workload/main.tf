@@ -15,7 +15,7 @@ variable "instance" {
   type = string
 }
 
-variable "prefix" {
+variable "kv_prefix" {
   type = string
 }
 
@@ -115,5 +115,5 @@ module "kv" {
   app_name                        = var.application_name
   env                             = var.environment
   instance                        = var.instance
-  prefix                          = var.prefix
+  kv_prefix                       = var.kv_prefix
 }
