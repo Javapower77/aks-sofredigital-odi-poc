@@ -21,18 +21,18 @@ variable "environment" {
 variable "main_instance" {
   type        = string
   description = "Instance code to be added to Main resources."
-  default     = "001"
+  default     = "primary"
 }
 
 variable "failover_instance" {
   type        = string
   description = "Instance code to be added to Failover resources."
-  default     = "002"
+  default     = "failover"
 }
 
 variable "jumbbox_vm_password" {
   type        = string
   description = "The password to connect to the Jumpbox VM"
-  default     = "P@ssw0rd.123"
+  default     = "Sofre#2023##"
   sensitive   = true
 }
