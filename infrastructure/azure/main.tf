@@ -28,13 +28,13 @@ provider "azurerm" {
 provider "azuread" {}
 
 locals {
-  global_root_name   = "${var.application_name}-${var.environment}-global"
+  global_root_name   = "${var.application_name}-${var.environment}-common"
   main_root_name     = "${var.application_name}-${var.environment}-${var.main_instance}"
   failover_root_name = "${var.application_name}-${var.environment}-${var.failover_instance}"
 
   global_location = var.main_location
 
-  global_tags   = { Instance = "Global", Ambiente = "POC", Analitica = "121-00000", Creator = "Javier Ibarra", Proyecto = "PoC Kubernetes para ODI", Sector = "Tecnologia" }
+  global_tags   = { Instance = "Common", Ambiente = "POC", Analitica = "121-00000", Creator = "Javier Ibarra", Proyecto = "PoC Kubernetes para ODI", Sector = "Tecnologia" }
   main_tags     = { Instance = "Main", Ambiente = "POC", Analitica = "121-00000", Creator = "Javier Ibarra", Proyecto = "PoC Kubernetes para ODI", Sector = "Tecnologia" }
   failover_tags = { Instance = "Failover", Ambiente = "POC", Analitica = "121-00000", Creator = "Javier Ibarra", Proyecto = "PoC Kubernetes para ODI", Sector = "Tecnologia" }
 }
